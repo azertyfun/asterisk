@@ -1380,7 +1380,10 @@ struct ast_variable *ast_http_get_post_vars(
 		return NULL;
 	}
 
-	while ((val = strsep(&buf, "&"))) {
+	// `strsep` will move its pointer, but we can't change `buf` since that
+	// would break the destructor.
+	char* iter = buf;
+	while ((val = strsep(&iter, "&"))) {
 		var = strsep(&val, "=");
 		if (val) {
 			ast_uri_decode(val, ast_uri_http_legacy);
